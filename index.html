@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Indian Currency Notes</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+        color: #111;
+      }
+      .app {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #3f7bdc;
+        font-size: 2rem;
+      }
+      .amount-input-section {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 8px;
+        color: white;
+      }
+      .amount-input-section label {
+        color: white;
+        font-size: 1.2rem;
+      }
+      .amount-input-section input {
+        border: 3px solid white !important;
+      }
+      .amount-input-section label {
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+      .amount-input-section input {
+        padding: 10px 15px;
+        font-size: 1rem;
+        border: 2px solid #3f7bdc;
+        border-radius: 4px;
+        width: 150px;
+      }
+      
+      /* Triple the size of totalAmount input */
+      #totalAmount {
+        width: 450px !important;
+        font-size: 1.1rem !important;
+        padding: 12px 20px !important;
+      }
+      
+      /* Desktop table view */
+      .table-wrapper {
+        overflow-x: auto;
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+      th, td {
+        border: 2px solid #111;
+        padding: 12px;
+        text-align: center;
+      }
+      th {
+        background-color: #3f7bdc;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      td {
+        font-size: 0.95rem;
+      }
+      .row-label {
+        background-color: #f0f0f0;
+        font-weight: 700;
+        text-align: left;
+        min-width: 120px;
+      }
+      .row-label.yellow {
+        background-color: #ffeb3b;
+      }
+      .row-label.green {
+        background-color: #90ee90;
+      }
+      .row-label.red {
+        background-color: #ff6b6b;
+        color: white;
+      }
+      input[type="number"] {
+        width: 80px;
+        padding: 6px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.95rem;
+      }
+      .result-cell {
+        font-weight: 600;
+        background-color: #f9f9f9;
+      }
+      .note-image {
+        display: inline-block;
+        max-width: 60px;
+        max-height: 40px;
+        margin: 2px;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+      }
+      .denomination-cell {
+        min-height: 60px;
+      }
+
+      /* stacked mobile view hidden by default */
+      .stacked{display:none}
+
+      /* Validation section */
+      .validation-section {
+        margin-top: 20px;
+        padding: 15px;
+        border: 2px solid #111;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+      }
+      .validation-section label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .validation-result {
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-align: center;
+      }
+      .validation-result.success {
+        background-color: #90ee90;
+        color: #155724;
+      }
+      .validation-result.error {
+        background-color: #ff6b6b;
+        color: white;
+      }
+
+      /* Kid-friendly enhancements */
+      .note-count {
+        font-size: 1.1rem !important;
+        font-weight: 600;
+        text-align: center;
+      }
+      .note-count:focus {
+        outline: none;
+        border: 2px solid #667eea !important;
+        box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+      }
+      .result-cell {
+        font-size: 1.1rem !important;
+        font-weight: 700;
+      }
+
+      /* Mobile responsive */
+      @media (max-width: 768px) {
+        .app {
+          padding: 15px;
+        }
+        th, td {
+          padding: 8px;
+          font-size: 0.85rem;
+        }
+        input[type="number"] {
+          width: 60px;
+          padding: 4px;
+          font-size: 0.85rem;
+        }
+        .amount-input-section {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .amount-input-section input {
+          width: 100%;
+        }
+        /* totalAmount responsive on mobile */
+        #totalAmount {
+          width: 100% !important;
+        }
+        /* make header fit a single line on small screens */
+        h1 {
+          font-size: 1.2rem;
+          margin-bottom: 12px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        /* hide wide table and show stacked mobile rows */
+        #currencyTable{display:none}
+        .stacked{display:block;margin-top:12px}
+      }
+      .stack-row{display:flex;align-items:center;justify-content:space-between;padding:10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;margin-bottom:8px}
+      .stack-row .left{display:flex;align-items:center;gap:10px;min-width:120px}
+      .stack-row img{max-width:56px;max-height:36px}
+      .stack-row .center{flex:1;display:flex;justify-content:center}
+      .stack-row .right{min-width:70px;text-align:right;font-weight:700}
+      /* watermark styling */
+      .watermark{
+        position:fixed;
+        right:12px;
+        bottom:12px;
+        font-size:14px;
+        font-weight:700;
+        color:#000;
+        opacity:0.12;
+        pointer-events:none;
+        user-select:none;
+        z-index:9999;
+        letter-spacing:0.6px;
+      }
+      @media (max-width:768px){
+        .watermark{font-size:12px;right:8px;bottom:8px;opacity:0.14}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <h1>भारतीय चलन - नाणी व नोटा</h1>
+
+      <div class="amount-input-section">
+        <label for="totalAmount">एकूण रुपये :</label>
+        <input type="number" id="totalAmount" min="0" value="100" placeholder="Enter amount">
+      </div>
+
+      <div class="table-wrapper">
+        <table id="currencyTable">
+          <thead>
+            <tr>
+              <th colspan="1"></th>
+              <th>१ रुपया </th>
+              <th>२ रुपये</th>
+              <th>५ रुपये</th>
+              <th>१० रुपये</th>
+              <th>२० रुपये</th>
+              <th>५० रुपये</th>
+              <th>१०० रुपये</th>
+              <th>२०० रुपये</th>
+              <th>५०० रु</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row 1: Denominations display with descriptions -->
+            <tr id="denominationRow">
+              <td class="row-label yellow">नोटा</td>
+              <td class="denomination-cell">
+                <img src="1.jpg" alt="1 रु" class="note-image">
+                <div style="font-size:0.8rem; margin-top:6px;">1 रु</div>
+              </td>
+              <td class="denomination-cell">
+                <img src="2.jpg" alt="2 रु" class="note-image">
+                <div style="font-size:0.8rem; margin-top:6px;">2 रु</div>
+              </td>
+              <td class="denomination-cell">
+                <img src="5.jpg" alt="5 रु" class="note-image">
+                <div style="font-size:0.8rem; margin-top:6px;">5 रु</div>
+              </td>
+              <td class="denomination-cell">
+                <img src="10.jpg" alt="10 रु" class="note-image">
+                <div style="font-size:0.8rem; margin-top:6px;">10 रु</div>
+              </td>
+              <td class="denomination-cell">
+                <img src="20.jpg" alt="20 रु" class="note-image">
+                <div style="font-size:0.8rem; margin-top:6px;">20 रु</div>
+              </td>
+              <td class="denomination-cell">
+                <img src="50.jpg" alt="50 रु" class="note-image">
+                <div style="font-size:0.8rem; margin-top:6px;">50 रु</div>
+              </td>
+              <td class="denomination-cell">
+                <img src="100.jpg" alt="100 रु" class="note-image">
+                <div style="font-size:0.8rem; margin-top:6px;">100 रु</div>
+              </td>
+              <td class="denomination-cell">
+                <img src="200.jpg" alt="200 रु" class="note-image">
+                <div style="font-size:0.8rem; margin-top:6px;">200 रु</div>
+              </td>
+              <td class="denomination-cell">
+                <img src="500.jpg" alt="500 रु" class="note-image">
+                <div style="font-size:0.8rem; margin-top:6px;">500 रु</div>
+              </td>
+            </tr>
+
+            <!-- Row 2: Count input -->
+            <tr id="countRow">
+              <td class="row-label green">नोटांची संख्या</td>
+              <td><input type="number" class="note-count" data-denomination="1" min="0" value="0"></td>
+              <td><input type="number" class="note-count" data-denomination="2" min="0" value="0"></td>
+              <td><input type="number" class="note-count" data-denomination="5" min="0" value="0"></td>
+              <td><input type="number" class="note-count" data-denomination="10" min="0" value="0"></td>
+              <td><input type="number" class="note-count" data-denomination="20" min="0" value="0"></td>
+              <td><input type="number" class="note-count" data-denomination="50" min="0" value="0"></td>
+              <td><input type="number" class="note-count" data-denomination="100" min="0" value="0"></td>
+              <td><input type="number" class="note-count" data-denomination="200" min="0" value="0"></td>
+              <td><input type="number" class="note-count" data-denomination="500" min="0" value="0"></td>
+            </tr>
+
+            <!-- Row 3: Total value per denomination -->
+            <tr id="totalRow">
+              <td class="row-label red">एकूण किंमत
+        
+              </td>
+              <td class="result-cell" id="result-1">0</td>
+              <td class="result-cell" id="result-2">0</td>
+              <td class="result-cell" id="result-5">0</td>
+              <td class="result-cell" id="result-10">0</td>
+              <td class="result-cell" id="result-20">0</td>
+              <td class="result-cell" id="result-50">0</td>
+              <td class="result-cell" id="result-100">0</td>
+              <td class="result-cell" id="result-200">0</td>
+              <td class="result-cell" id="result-500">0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+        <!-- Stacked mobile view (shows on small screens) -->
+        <div class="stacked" id="stackedView">
+          <div class="stack-row">
+            <div class="left"><img src="1.jpg" alt="1" class="note-image"><div>1 रु</div></div>
+            <div class="center"><input type="number" class="s-note-count" data-denomination="1" min="0" value="0"></div>
+            <div class="right" id="s-result-1">0</div>
+          </div>
+          <div class="stack-row">
+            <div class="left"><img src="2.jpg" alt="2" class="note-image"><div>2 रु</div></div>
+            <div class="center"><input type="number" class="s-note-count" data-denomination="2" min="0" value="0"></div>
+            <div class="right" id="s-result-2">0</div>
+          </div>
+          <div class="stack-row">
+            <div class="left"><img src="5.jpg" alt="5" class="note-image"><div>5 रु</div></div>
+            <div class="center"><input type="number" class="s-note-count" data-denomination="5" min="0" value="0"></div>
+            <div class="right" id="s-result-5">0</div>
+          </div>
+          <div class="stack-row">
+            <div class="left"><img src="10.jpg" alt="10" class="note-image"><div>10 रु</div></div>
+            <div class="center"><input type="number" class="s-note-count" data-denomination="10" min="0" value="0"></div>
+            <div class="right" id="s-result-10">0</div>
+          </div>
+          <div class="stack-row">
+            <div class="left"><img src="20.jpg" alt="20" class="note-image"><div>20 रु</div></div>
+            <div class="center"><input type="number" class="s-note-count" data-denomination="20" min="0" value="0"></div>
+            <div class="right" id="s-result-20">0</div>
+          </div>
+          <div class="stack-row">
+            <div class="left"><img src="50.jpg" alt="50" class="note-image"><div>50 रु</div></div>
+            <div class="center"><input type="number" class="s-note-count" data-denomination="50" min="0" value="0"></div>
+            <div class="right" id="s-result-50">0</div>
+          </div>
+          <div class="stack-row">
+            <div class="left"><img src="100.jpg" alt="100" class="note-image"><div>100 रु</div></div>
+            <div class="center"><input type="number" class="s-note-count" data-denomination="100" min="0" value="0"></div>
+            <div class="right" id="s-result-100">0</div>
+          </div>
+          <div class="stack-row">
+            <div class="left"><img src="200.jpg" alt="200" class="note-image"><div>200 रु</div></div>
+            <div class="center"><input type="number" class="s-note-count" data-denomination="200" min="0" value="0"></div>
+            <div class="right" id="s-result-200">0</div>
+          </div>
+          <div class="stack-row">
+            <div class="left"><img src="500.jpg" alt="500" class="note-image"><div>500 रु</div></div>
+            <div class="center"><input type="number" class="s-note-count" data-denomination="500" min="0" value="0"></div>
+            <div class="right" id="s-result-500">0</div>
+          </div>
+        </div>
+
+      <div class="validation-section">
+                                      <label>एकूण रुपये
+                                           :</label>
+        <div class="validation-result" id="validationResult" style="font-size: 1.3rem; min-height: 50px; display: flex; align-items: center; justify-content: center;">
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const totalAmountInput = document.getElementById('totalAmount');
+      const countInputs = document.querySelectorAll('.note-count');
+      const validationResult = document.getElementById('validationResult');
+
+      const denominations = [1, 2, 5, 10, 20, 50, 100, 200, 500];
+
+      function calculateTotals() {
+        let grandTotal = 0;
+
+        denominations.forEach(denom => {
+          const countInput = document.querySelector(`input[data-denomination="${denom}"]`);
+          const count = parseInt(countInput.value) || 0;
+          const total = count * denom;
+          
+          const resultCell = document.getElementById(`result-${denom}`);
+          resultCell.textContent = total;
+          // update stacked view result & input (if present)
+          const sResult = document.getElementById(`s-result-${denom}`);
+          if(sResult) sResult.textContent = total;
+          const sInput = document.querySelector(`.s-note-count[data-denomination="${denom}"]`);
+          if(sInput && sInput !== countInput) sInput.value = count;
+          
+          grandTotal += total;
+        });
+
+        // Update validation
+        const targetAmount = parseInt(totalAmountInput.value) || 0;
+        const resultDiv = document.getElementById('validationResult');
+
+        if (grandTotal === targetAmount && targetAmount > 0) {
+          resultDiv.className = 'validation-result success';
+          resultDiv.textContent = `🎉 ${grandTotal} रुपये बरोबरआहे!`;
+        } else if (grandTotal > targetAmount) {
+          resultDiv.className = 'validation-result error';
+          resultDiv.textContent = `❌ जास्त आहे: ${grandTotal} रुपये (${grandTotal - targetAmount} रु जास्त झाले)`;
+        } else if (grandTotal < targetAmount && grandTotal > 0) {
+          resultDiv.className = 'validation-result error';
+          resultDiv.textContent = `❌ कमी आहे: ${grandTotal} रुपये (${targetAmount - grandTotal} रु कमी राहिले)`;
+        } else {
+          resultDiv.className = 'validation-result';
+          resultDiv.textContent = '';
+        }
+      }
+
+      // Add event listeners and sync between desktop and stacked inputs
+      countInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+          const denom = e.target.getAttribute('data-denomination');
+          const sInput = document.querySelector(`.s-note-count[data-denomination="${denom}"]`);
+          if (sInput && sInput.value !== e.target.value) sInput.value = e.target.value;
+          calculateTotals();
+        });
+      });
+
+      // stacked inputs sync back to desktop inputs
+      document.querySelectorAll('.s-note-count').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const denom = e.target.getAttribute('data-denomination');
+          const dInput = document.querySelector(`input[data-denomination="${denom}"]`);
+          if (dInput && dInput.value !== e.target.value) dInput.value = e.target.value;
+          calculateTotals();
+        });
+      });
+
+      totalAmountInput.addEventListener('input', calculateTotals);
+
+      // Initial calculation
+      calculateTotals();
+    </script>
+    <!-- Watermark -->
+    <div class="watermark">T. S. Jagadale</div>
+  </body>
+</html>
